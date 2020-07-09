@@ -6,7 +6,10 @@ class InitCrawler():
 		self.__Session = requests.Session() 
 
 	def Get(self, Task ):
-		r = self.__Session.get(Task.url, headers=Task.Header)
+		try:
+			r = self.__Session.get(Task.url, headers=Task.Header)
+		except:
+			Task.resp = "Error: get error"
 		if r.status_code == requests.codes.ok:
 			Task.resp = r.text 
 		else:
@@ -15,7 +18,10 @@ class InitCrawler():
 
 
 	def Post(self, Task ):
-		r = self.__Session.post(Task.url, headers = Task.Header, data = Task.dataset)
+		try:
+			r = self.__Session.post(Task.url, headers = Task.Header, data = Task.dataset)
+		except:
+			Task.resp = "Error: post error"
 		if r.status_code == requests.codes.ok:
 			Task.resp = r.text 
 		else:
