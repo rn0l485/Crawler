@@ -3,7 +3,6 @@ package worker
 import (
 	"bytes"
 	"net/http"
-	"net/url"
 	"io/ioutil"
 
 	"github.com/json-iterator/go"
@@ -26,7 +25,7 @@ type worker struct {
 	Cookies 		map[string][]*http.Cookie
 }
 
-func (w worker) Get(gurl string) *Response {
+func (w worker) Get(gurl string) Response {
 	// make req
 	req, _ := http.NewRequest("GET", gurl, nil)
 	if w.Header != nil {
@@ -64,11 +63,11 @@ func (w worker) Get(gurl string) *Response {
 		Body 		: body,
 	}
 
-	return *given
+	return given
 }
 
 
-func (w worker) Post(gurl string, data map[string]interface{}) *Response{
+func (w worker) Post(gurl string, data map[string]interface{}) Response{
 	// make req
 	b, err := jsoniter.Marshal(data)
 	if err != nil{
@@ -78,8 +77,8 @@ func (w worker) Post(gurl string, data map[string]interface{}) *Response{
 	if w.Header != nil {
 		req.Header = w.Header
 	}
-	if given, ok := w.Client.Jar.Jar[gurl]; ok{
-		for _,c := range w.Client.Jar.Jar[gurl] {
+	if cookie, ok := w.Cookies[gurl]; ok{
+		for _,c := range cookie {
 			req.AddCookie(c)
 		}
 	}
@@ -98,7 +97,7 @@ func (w worker) Post(gurl string, data map[string]interface{}) *Response{
 
 	// cookie
 	cookies := resp.Cookies()
-	w.SetCookies(u, cookies)	
+	w.SetCookies(gurl, cookies)	
 
 	given := Response{
 		Status 		: resp.Status,
@@ -108,11 +107,11 @@ func (w worker) Post(gurl string, data map[string]interface{}) *Response{
 		Body 		: body,
 	}
 
-	return *given
+	return given
 
 }
 
-func (w worker) SetCookies (u string, cookies []*http.Cookie){
+func (w worker) SetCookies (url string, cookies []*http.Cookie){
 	if given, ok := w.Cookies[url]; ok {
 		for _,c := range cookies {
 			w.Cookies[url] = append( given, c)
@@ -122,7 +121,7 @@ func (w worker) SetCookies (u string, cookies []*http.Cookie){
 	}
 }
 
-func (w worker) Cookies(u string) []*http.Cookie {	
+func (w worker) GetCookies(url string) []*http.Cookie {	
 	if given, ok := w.Cookies[url]; ok {
 		return given
 	} else {
@@ -130,9 +129,13 @@ func (w worker) Cookies(u string) []*http.Cookie {
 	}
 }
 
-func InitWorker() *worker{
+func InitWorker() worker{
 	c := &http.Client{}
-	return worker{Client:c,}
+	w := worker{
+		Client:c,
+		Cookies: make(map[string][]*http.Cookie),
+	}
+	return w
 }
 
 
