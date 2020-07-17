@@ -10,8 +10,9 @@ func main() {
 
 	c := make(chan worker.Response)
 
-	c <- w.Get("https://www.etron-valve.com")
-	resp <- c
+	go w.Get("https://www.etron-valve.com", c)
 
-	fmt.Println(string(resp.Header))
+	resp := <- c
+
+	fmt.Println(resp.Header)
 }
