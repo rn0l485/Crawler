@@ -20,11 +20,10 @@ type Response struct {
 
 
 
-
 type worker struct {
 	Client 			*http.Client
 	Header 			http.Header
-	CookiesJar 		map[string][]*http.Cookie
+	Cookies 		map[string][]*http.Cookie
 }
 
 func (w worker) Get(gurl string) *Response {
@@ -33,8 +32,8 @@ func (w worker) Get(gurl string) *Response {
 	if w.Header != nil {
 		req.Header = w.Header
 	}
-	if given, ok := w.Client.Jar.Jar[gurl]; ok{
-		for _,c := range w.Client.Jar.Jar[gurl] {
+	if cookie, ok := w.Cookies[gurl]; ok{
+		for _,c := range cookie {
 			req.AddCookie(c)
 		}
 	}
@@ -53,12 +52,8 @@ func (w worker) Get(gurl string) *Response {
 	}
 
 	// cookie
-	u, err := url.Parse(gurl)
-	if err != nil {
-		panic(err)
-	}
 	cookies := resp.Cookies()
-	w.Client.Jar.SetCookies(u, cookies)
+	w.SetCookies(gurl, cookies)
 
 	// set resp
 	given := Response{
@@ -102,12 +97,8 @@ func (w worker) Post(gurl string, data map[string]interface{}) *Response{
 	}
 
 	// cookie
-	u, err := url.Parse(gurl)
-	if err != nil {
-		panic(err)
-	}
 	cookies := resp.Cookies()
-	w.Client.Jar.SetCookies(u, cookies)	
+	w.SetCookies(u, cookies)	
 
 	given := Response{
 		Status 		: resp.Status,
@@ -121,10 +112,26 @@ func (w worker) Post(gurl string, data map[string]interface{}) *Response{
 
 }
 
+func (w worker) SetCookies (u string, cookies []*http.Cookie){
+	if given, ok := w.Cookies[url]; ok {
+		for _,c := range cookies {
+			w.Cookies[url] = append( given, c)
+		}
+	} else {
+		w.Cookies[url] = cookies
+	}
+}
+
+func (w worker) Cookies(u string) []*http.Cookie {	
+	if given, ok := w.Cookies[url]; ok {
+		return given
+	} else {
+		return nil
+	}
+}
 
 func InitWorker() *worker{
 	c := &http.Client{}
-	c.Jar = &cookieJar{}
 	return worker{Client:c,}
 }
 
