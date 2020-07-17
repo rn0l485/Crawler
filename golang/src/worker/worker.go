@@ -27,7 +27,7 @@ type worker struct {
 	Header 			*http.Header
 }
 
-func (w worker) Get(gurl string) *response {
+func (w worker) Get(gurl string) *Response {
 	// make req
 	req, _ := http.NewRequest("GET", gurl, nil)
 	req.Header = w.Header
@@ -71,7 +71,7 @@ func (w worker) Get(gurl string) *response {
 	return given
 }
 
-func (w worker) Post(url string, data map[string]interface{}) {
+func (w worker) Post(url string, data map[string]interface{}) *Response {
 	// make req
 	b, err := jsoniter.Marshal(data)
 	if err != nil{
