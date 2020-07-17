@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"golang/worker"
+	"worker"
 )
 
 func main() {

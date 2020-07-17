@@ -1,7 +1,6 @@
 package worker 
 
 import (
-	"log"
 	"bytes"
 	"net/http"
 	"net/url"
@@ -15,7 +14,7 @@ type Response struct {
 	Status			string
 	StatusCode 		int
 	Proto			string
-	Header 			*http.Header
+	Header 			http.Header
 	Body 			[]byte	
 }
 
@@ -24,14 +23,15 @@ type Response struct {
 
 type worker struct {
 	Client 			*http.Client
-	Header 			*http.Header
+	Header 			http.Header
 }
 
-func (w worker) Get(gurl string) *response {
+func (w worker) Get(gurl string) Response {
 	// make req
 	req, _ := http.NewRequest("GET", gurl, nil)
-	req.Header = w.Header
-
+	if w.Header != nil {
+		req.Header = w.Header
+	}
 	if given, ok := w.Client.Jar.Jar[gurl]; ok{
 		for _,c := range w.Client.Jar.Jar[gurl] {
 			req.AddCookie(c)
@@ -56,7 +56,7 @@ func (w worker) Get(gurl string) *response {
 	if err != nil {
 		panic(err)
 	}
-	cookies := resp.Cookies
+	cookies := resp.Cookies()
 	w.Client.Jar.SetCookies(u, cookies)
 
 	// set resp
@@ -71,14 +71,16 @@ func (w worker) Get(gurl string) *response {
 	return given
 }
 
-func (w worker) Post(url string, data map[string]interface{}) {
+func (w worker) Post(gurl string, data map[string]interface{}) Response{
 	// make req
 	b, err := jsoniter.Marshal(data)
 	if err != nil{
 		panic(err)
 	}
-	req, _ := http.NewRequest( "POST", url, bytes.NewBuffer(b))
-	req.Header = w.Header
+	req, _ := http.NewRequest( "POST", gurl, bytes.NewBuffer(b))
+	if w.Header != nil {
+		req.Header = w.Header
+	}
 	if given, ok := w.Client.Jar.Jar[gurl]; ok{
 		for _,c := range w.Client.Jar.Jar[gurl] {
 			req.AddCookie(c)
@@ -103,7 +105,7 @@ func (w worker) Post(url string, data map[string]interface{}) {
 	if err != nil {
 		panic(err)
 	}
-	cookies := resp.Cookies
+	cookies := resp.Cookies()
 	w.Client.Jar.SetCookies(u, cookies)	
 
 	given := Response{
@@ -119,13 +121,10 @@ func (w worker) Post(url string, data map[string]interface{}) {
 }
 
 
-func InitWorker() (w *worker){
+func InitWorker() *worker{
 	c := &http.Client{}
 	c.Jar = &cookieJar{}
-	w := Worker{
-		Client:c,
-	}
-	return 
+	return worker{Client:c,}
 }
 
 
