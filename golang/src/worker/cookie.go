@@ -6,7 +6,7 @@ import (
 )
 
 type cookieJar struct {
-	Jar					map[string][]*Cookie
+
 }
 func (j *cookieJar) SetCookies (u *url.URL, cookies []*http.Cookie){
 	url := u.String()
