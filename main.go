@@ -7,6 +7,11 @@ import (
 
 func main() {
 	w := worker.InitWorker()
-	resp := w.Get("https://www.etron-valve.com")
-	fmt.Println(string(resp.Body))
+
+	c := make(chan worker.Response)
+
+	c <- w.Get("https://www.etron-valve.com")
+	resp <- c
+
+	fmt.Println(string(resp.Header))
 }

@@ -121,13 +121,6 @@ func (w worker) SetCookies (url string, cookies []*http.Cookie){
 	}
 }
 
-func (w worker) GetCookies(url string) []*http.Cookie {	
-	if given, ok := w.Cookies[url]; ok {
-		return given
-	} else {
-		return nil
-	}
-}
 
 func InitWorker() worker{
 	c := &http.Client{}
