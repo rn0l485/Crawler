@@ -11,8 +11,9 @@ func main() {
 	c := make(chan worker.Response)
 
 	go w.Get("https://www.etron-valve.com", c)
-
-	resp := <- c
-
-	fmt.Println(resp.Header)
+	go w.Get("https://michaelchen.tech/golang-programming/concurrency/", c)
+	for i:=0; i<2; i++ {
+		resp := <- c
+		fmt.Println(resp.Header)
+	}
 }
