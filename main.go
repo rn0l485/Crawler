@@ -10,8 +10,10 @@ func main() {
 
 	c := make(chan worker.Response)
 
-	c <- w.Get("https://www.etron-valve.com")
-	resp <- c
-
-	fmt.Println(string(resp.Header))
+	go w.Get("https://www.etron-valve.com", c)
+	go w.Get("https://michaelchen.tech/golang-programming/concurrency/", c)
+	for i:=0; i<2; i++ {
+		resp := <- c
+		fmt.Println(resp.Header)
+	}
 }
