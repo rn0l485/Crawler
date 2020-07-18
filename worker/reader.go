@@ -6,6 +6,5 @@ import (
 
 
 type reader struct {
-	Target 			string
 	
 }
