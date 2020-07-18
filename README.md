@@ -4,14 +4,18 @@ Crawler in Golang
 
 Easy to use in goroutine as below:
 ```golang
+func main(){
 	w := worker.InitWorker()
 
 	c := make(chan worker.Response)
 
-	c <- w.Get("your url here")
-	resp <- c
-
-	fmt.Println(resp.Header)
+	go w.Get("First web url", c)
+	go w.Get("Second web url", c)
+	for i:=0; i<2; i++ {
+		resp := <- c
+		fmt.Println(resp.Header)
+	}
+}
 ```
 
 Currently, just support GET and POST, the useful methods I guess. 
