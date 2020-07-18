@@ -33,12 +33,21 @@ type Response struct {
 
 Currently, just support GET and POST, the useful methods I guess. 
 
+For the worker struct:
+```golang
+type worker struct {
+	Client 			*http.Client
+	Header 			http.Header
+	Cookies 		map[string][]*http.Cookie
+}
+```
+
 For the GET method:
-
+```golang
 func (w worker) Get(url string) Response
-
+```
 For the POST method:
-
+```golang
 func (w worker) Post(url string, data map[string]interface{}) Response
-
+```
 
