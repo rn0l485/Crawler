@@ -26,6 +26,7 @@ type worker struct {
 }
 
 func (w worker) Get(gurl string, channel chan Response) {
+
 	// make req
 	req, _ := http.NewRequest("GET", gurl, nil)
 	if w.Header != nil {
