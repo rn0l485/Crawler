@@ -9,9 +9,6 @@ type controller struct {
 
 }
 
-
-
-
 func InitController( num int) (c *controller){
 	return c 
 }
