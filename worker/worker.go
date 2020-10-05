@@ -25,7 +25,7 @@ type worker struct {
 	Cookies 		map[string][]*http.Cookie
 }
 
-func (w worker) Get(gurl string, channel chan Response) {
+func (w worker) Get(gurl string, setCookies bool, channel chan Response) {
 
 	// make req
 	req, _ := http.NewRequest("GET", gurl, nil)
@@ -52,9 +52,10 @@ func (w worker) Get(gurl string, channel chan Response) {
 	}
 
 	// cookie
-	cookies := resp.Cookies()
-	w.SetCookies(gurl, cookies)
-
+	if setCookies{
+		cookies := resp.Cookies()
+		w.SetCookies(gurl, cookies)
+	}
 	// set resp
 	given := Response{
 		Status 		: resp.Status,
@@ -68,7 +69,7 @@ func (w worker) Get(gurl string, channel chan Response) {
 }
 
 
-func (w worker) Post(gurl string, data map[string]interface{}, channel chan Response) {
+func (w worker) Post(gurl string, setCookies bool, data map[string]interface{}, channel chan Response) {
 	// make req
 	b, err := jsoniter.Marshal(data)
 	if err != nil{
@@ -97,8 +98,10 @@ func (w worker) Post(gurl string, data map[string]interface{}, channel chan Resp
 	}
 
 	// cookie
-	cookies := resp.Cookies()
-	w.SetCookies(gurl, cookies)	
+	if setCookies {
+		cookies := resp.Cookies()
+		w.SetCookies(gurl, cookies)	
+	}
 
 	given := Response{
 		Status 		: resp.Status,
