@@ -52,10 +52,10 @@ type worker struct {
 
 For the GET method:
 ```golang
-func (w worker) Get(url string) Response
+func (w worker) Get(gurl string, setCookies bool, channel chan Response)
 ```
 For the POST method:
 ```golang
-func (w worker) Post(url string, data map[string]interface{}) Response
+func (w worker) Post(gurl string, setCookies bool, data map[string]interface{}, channel chan Response)
 ```
 
