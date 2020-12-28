@@ -12,8 +12,11 @@ func main(){
 	go w.Get("First web url", false, c)
 	go w.Get("Second web url", false, c)
 	for i:=0; i<2; i++ {
-		resp := <- c
-		fmt.Println(resp.Header)
+		select{
+		case resp := <- c:
+			fmt.Println(resp.Header)
+		case <- time.After( 10 * time.Second):
+			continue
 	}
 }
 ```
